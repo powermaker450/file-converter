@@ -5,16 +5,20 @@ import {
   Card,
   CardActions,
   CardContent,
+  CircularProgress,
   Grid,
   LinearProgress,
   Typography,
 } from "@mui/material";
-import { CloudUpload } from "@mui/icons-material";
+import { CloudUpload, VideocamRounded } from "@mui/icons-material";
 import { useFilePicker } from "use-file-picker";
 import { useEffect, useRef, useState, type ComponentProps } from "react";
 import InputSlider from "../components/InputSlider";
 import { FFmpeg, type ProgressEventCallback } from "@ffmpeg/ffmpeg";
+import { fetchFile } from "@ffmpeg/util";
 import { useAlert } from "../contexts/AlertProvider";
+import wasm from "@ffmpeg/core/wasm?url";
+import core from "@ffmpeg/core?url";
 
 type BoxStyle = ComponentProps<typeof Box>["sx"];
 
@@ -30,6 +34,7 @@ const Video = () => {
   const { current: ffmpeg } = useRef(new FFmpeg());
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const [loading, setLoading] = useState(true);
   const [crf, setCrf] = useState(32);
   const [progress, setProgress] = useState(0);
 
@@ -38,10 +43,34 @@ const Video = () => {
       setProgress(e.progress);
 
     ffmpeg.on("progress", progressListener);
+    ffmpeg.on("log", log => {
+      console.log(log);
+    });
 
     return () => {
       ffmpeg.off("progress", progressListener);
     };
+  }, []);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        console.log("Loading wasm");
+        await ffmpeg.load({
+          coreURL: core,
+          wasmURL: wasm,
+        });
+        console.log("Finished loading wasm");
+        setLoading(false);
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err);
+          notice.error(err.message);
+        }
+      }
+    }
+
+    load();
   }, []);
 
   const picker = useFilePicker({
@@ -50,19 +79,20 @@ const Video = () => {
   });
 
   const video = picker.plainFiles.at(0);
+  const videoUrl = video && URL.createObjectURL(video);
+
   useEffect(() => {
     async function set() {
-      if (!video || !videoRef.current) {
+      if (!videoUrl || !videoRef.current) {
         return;
       }
 
-      videoRef.current.src = URL.createObjectURL(video);
-
-      await ffmpeg.writeFile(video.name, await video.bytes());
+      videoRef.current.src = videoUrl;
+      await ffmpeg.writeFile(video.name, await fetchFile(videoUrl));
     }
 
     set();
-  }, [video]);
+  }, [videoUrl]);
 
   const execute = async () => {
     try {
@@ -70,7 +100,13 @@ const Video = () => {
         throw new Error("No video");
       }
 
-      await ffmpeg.exec(["-i", `-crf ${crf}`, video.name, "output.mp4"]);
+      await ffmpeg.exec([
+        "-i",
+        video.name,
+        "-crf",
+        crf.toString(),
+        "output.mp4",
+      ]);
       const data = await ffmpeg.readFile("output.mp4");
       videoRef.current.src = URL.createObjectURL(
         new Blob([data.buffer], { type: "video/mp4" }),
@@ -95,6 +131,15 @@ const Video = () => {
       width: "100%",
     },
   };
+
+  if (loading) {
+    return (
+      <Grid container sx={{ placeItems: "center" }}>
+        <CircularProgress />
+        <Typography>Loading wasm...</Typography>
+      </Grid>
+    );
+  }
 
   return (
     <MainView sx={styles.mainView}>
