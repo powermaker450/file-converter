@@ -5,7 +5,11 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   plugins: [react()],
   server: {
-    allowedHosts: ["puter"]
+    allowedHosts: ["puter"],
+    headers: {
+      "Cross-Origin-Embedder-Policy": "credentialless",
+      "Cross-Origin-Opener-Policy": "same-origin"
+    }
   },
   optimizeDeps: {
     exclude: ["@ffmpeg/ffmpeg"]
