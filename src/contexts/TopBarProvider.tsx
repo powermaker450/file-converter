@@ -37,7 +37,7 @@ export const TopBarProvider = ({ children }: TopBarProviderProps) => {
 
   return (
     <TopBarContext.Provider value={{}}>
-      <AppBar position="sticky">
+      <AppBar>
         <Toolbar sx={styles.toolbar}>
           {routes.map(route => (
             <Button key={route.text} component={RouterLink} to={route.to}>

@@ -7,14 +7,13 @@ import {
   CardContent,
   CircularProgress,
   Grid,
-  LinearProgress,
   Typography,
 } from "@mui/material";
-import { CloudUpload, VideocamRounded } from "@mui/icons-material";
+import { CloudUpload } from "@mui/icons-material";
 import { useFilePicker } from "use-file-picker";
 import { useEffect, useRef, useState, type ComponentProps } from "react";
 import InputSlider from "../components/InputSlider";
-import { FFmpeg, type ProgressEventCallback } from "@ffmpeg/ffmpeg";
+import { FFmpeg, type LogEventCallback } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
 import { useAlert } from "../contexts/AlertProvider";
 import wasm from "@ffmpeg/core/wasm?url";
@@ -23,7 +22,6 @@ import core from "@ffmpeg/core?url";
 type BoxStyle = ComponentProps<typeof Box>["sx"];
 
 interface VideoStyleSheet {
-  mainView: ComponentProps<typeof MainView>["sx"];
   videoBox: BoxStyle;
   videoPlayer: object;
 }
@@ -36,19 +34,16 @@ const Video = () => {
 
   const [loading, setLoading] = useState(true);
   const [crf, setCrf] = useState(32);
-  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const progressListener: ProgressEventCallback = e =>
-      setProgress(e.progress);
+    const logListener: LogEventCallback = e => {
+      console.log(e);
+    };
 
-    ffmpeg.on("progress", progressListener);
-    ffmpeg.on("log", log => {
-      console.log(log);
-    });
+    ffmpeg.on("log", logListener);
 
     return () => {
-      ffmpeg.off("progress", progressListener);
+      ffmpeg.off("log", logListener);
     };
   }, []);
 
@@ -119,11 +114,6 @@ const Video = () => {
   };
 
   const styles: VideoStyleSheet = {
-    mainView: {
-      padding: 5,
-      width: "85%",
-      margin: "auto",
-    },
     videoBox: {
       width: "50%",
     },
@@ -134,15 +124,15 @@ const Video = () => {
 
   if (loading) {
     return (
-      <Grid container sx={{ placeItems: "center" }}>
+      <MainView sx={{ gap: 2 }}>
         <CircularProgress />
         <Typography>Loading wasm...</Typography>
-      </Grid>
+      </MainView>
     );
   }
 
   return (
-    <MainView sx={styles.mainView}>
+    <MainView>
       {!picker.filesContent.length ? (
         <Button
           variant="contained"
@@ -173,10 +163,6 @@ const Video = () => {
 
           <InputSlider value={crf} setValue={setCrf} />
           <Button onClick={execute}>Execute</Button>
-
-          <Box sx={{ width: "100%" }}>
-            <LinearProgress variant="determinate" value={progress} />
-          </Box>
         </Grid>
       ) : undefined}
     </MainView>

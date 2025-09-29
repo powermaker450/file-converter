@@ -1,28 +1,27 @@
-import { Box } from "@mui/material";
-import type { ComponentProps, ReactNode } from "react";
+import { Grid } from "@mui/material";
+import type { ComponentProps } from "react";
 
-type BoxProps = ComponentProps<typeof Box>;
-
-interface MainViewProps {
-  sx?: BoxProps["sx"];
-  children?: ReactNode;
-}
+type GridProps = ComponentProps<typeof Grid>;
 
 interface MainViewStyleSheet {
-  mainView: BoxProps["sx"];
+  mainView: GridProps["sx"];
 }
 
-const MainView = ({ sx, children }: MainViewProps) => {
+const MainView = (props: GridProps) => {
   const styles: MainViewStyleSheet = {
     mainView: {
-      display: "flex",
+      flex: 1,
       flexDirection: "column",
       placeItems: "center",
-      ...sx,
+      ...props.sx,
     },
   };
 
-  return <Box sx={styles.mainView}>{children}</Box>;
+  return (
+    <Grid container {...props} sx={styles.mainView}>
+      {props.children}
+    </Grid>
+  );
 };
 
 export default MainView;
