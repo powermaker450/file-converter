@@ -12,6 +12,6 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    exclude: ["@ffmpeg/ffmpeg"]
+    exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"]
   }
 })
