@@ -8,7 +8,7 @@ const RootLayout = () => {
 
   if (loading) {
     return (
-      <MainView sx={{ gap: 2 }}>
+      <MainView spacing={2}>
         <CircularProgress />
         <Typography variant="h2">Loading FFmpeg...</Typography>
       </MainView>

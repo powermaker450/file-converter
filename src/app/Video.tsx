@@ -1,31 +1,19 @@
 import MainView from "../components/MainView";
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CircularProgress,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Button, Grid, Link } from "@mui/material";
 import { CloudUpload } from "@mui/icons-material";
 import { useFilePicker } from "use-file-picker";
-import { useEffect, type ComponentProps, type JSX } from "react";
+import { useEffect, useState, type JSX } from "react";
 import { useAlert } from "../contexts/AlertProvider";
 import { useFFmpeg } from "../contexts/FFmpegProvider";
 import { fetchFile } from "@ffmpeg/util";
-
-type BoxStyle = ComponentProps<typeof Box>["sx"];
-
-interface VideoStyleSheet {
-  videoBox: BoxStyle;
-  videoPlayer: object;
-}
+import FilePreview from "../components/FilePreview";
+import CRFSlider from "../components/CRFSlider";
 
 const Video = () => {
   const notice = useAlert();
-  const { ffmpeg, loading } = useFFmpeg();
+  const { ffmpeg } = useFFmpeg();
+  const [crf, setCrf] = useState(32);
+  const [download, setDownload] = useState<string>();
 
   const picker = useFilePicker({
     multiple: false,
@@ -34,6 +22,32 @@ const Video = () => {
 
   const video = picker.plainFiles.at(0);
   const videoUrl = video && URL.createObjectURL(video);
+
+  const execute = async () => {
+    if (!video) {
+      notice.error("No video selected");
+      return;
+    }
+
+    try {
+      await ffmpeg.exec([
+        "-i",
+        video.name,
+        "-crf",
+        crf.toString(),
+        "output.mp4",
+      ]);
+      const file = await ffmpeg.readFile("output.mp4");
+      setDownload(
+        URL.createObjectURL(new Blob([file.buffer], { type: video.type })),
+      );
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error(err);
+        notice.error(err.message);
+      }
+    }
+  };
 
   useEffect(() => {
     async function set() {
@@ -47,40 +61,9 @@ const Video = () => {
     set();
   }, [videoUrl]);
 
-  const execute = async () => {
-    try {
-      if (!video) {
-        throw new Error("No video");
-      }
-
-      const data = await ffmpeg.readFile("output.mp4");
-      console.log(data);
-    } catch (err) {
-      if (err instanceof Error) {
-        notice.error(err.message);
-      }
-    }
-  };
-
-  const styles: VideoStyleSheet = {
-    videoBox: {
-      width: "50%",
-    },
-    videoPlayer: {
-      width: "100%",
-    },
-  };
-
   let content: JSX.Element;
 
-  if (loading) {
-    content = (
-      <MainView sx={{ gap: 2 }}>
-        <CircularProgress />
-        <Typography>Loading wasm...</Typography>
-      </MainView>
-    );
-  } else if (!picker.filesContent.length) {
+  if (!picker.filesContent.length) {
     content = (
       <MainView>
         <Button
@@ -96,20 +79,16 @@ const Video = () => {
   } else {
     content = (
       <Grid container spacing={5}>
-        <Card sx={styles.videoBox}>
-          <CardContent>
-            <Typography variant="h5">{video?.name}</Typography>
-            <Typography variant="h6">{`${(video?.size ?? 0 / 1_000_000).toFixed(2)} MB`}</Typography>
-          </CardContent>
+        <FilePreview file={video} remove={picker.clear} />
 
-          <CardActions>
-            <Button onClick={picker.clear} color="error">
-              Remove
-            </Button>
-          </CardActions>
-        </Card>
+        <Grid container direction="column" justifyContent="space-between">
+          <CRFSlider crf={crf} setCrf={setCrf} />
+          <Button variant="contained" onClick={execute}>
+            Execute
+          </Button>
 
-        <Button onClick={execute}>Execute</Button>
+          {download && <Link href={download}>TO</Link>}
+        </Grid>
       </Grid>
     );
   }
