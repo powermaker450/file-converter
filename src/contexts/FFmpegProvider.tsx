@@ -31,7 +31,7 @@ export const FFmpegProvider = ({ children }: FFmpegProviderProps) => {
 
   useEffect(() => {
     const logListener: LogEventCallback = e => {
-      console.log(e);
+      console.log("[FFMPEG]", e.message);
     };
 
     ffmpeg.on("log", logListener);
