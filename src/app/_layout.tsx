@@ -1,21 +1,45 @@
-import { CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { useFFmpeg } from "../contexts/FFmpegProvider";
 import MainView from "../components/MainView";
 import { Outlet } from "react-router";
+import { Error as ErrorIcon } from "@mui/icons-material";
+import type { JSX } from "react";
+import { TopBarProvider } from "../contexts/TopBarProvider";
 
 const RootLayout = () => {
-  const { loading } = useFFmpeg();
+  const { loading, error, errorData } = useFFmpeg();
+  const showPreload = loading || error;
+
+  let content: JSX.Element;
 
   if (loading) {
-    return (
-      <MainView spacing={2}>
+    content = (
+      <>
         <CircularProgress />
         <Typography variant="h2">Loading FFmpeg...</Typography>
-      </MainView>
+      </>
     );
+  } else if (error) {
+    content = (
+      <>
+        <ErrorIcon sx={{ fontSize: 64 }} color="error" />
+        <Typography variant="h2">Error loading FFmpeg:</Typography>
+        <Typography variant="h3">{errorData?.message}</Typography>
+      </>
+    );
+  } else {
+    content = <></>;
   }
 
-  return <Outlet />;
+  if (showPreload) {
+    return <MainView spacing={2}>{content}</MainView>;
+  }
+
+  return (
+    <TopBarProvider>
+      <Outlet />
+    </TopBarProvider>
+  );
 };
 
 export default RootLayout;

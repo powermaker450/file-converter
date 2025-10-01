@@ -20,6 +20,8 @@ interface FFmpegProviderProps {
 interface FFmpegProviderData {
   ffmpeg: FFmpeg;
   loading: boolean;
+  error: boolean;
+  errorData: Error | undefined;
 }
 
 const FFmpegContext = createContext<FFmpegProviderData | undefined>(undefined);
@@ -28,6 +30,8 @@ export const FFmpegProvider = ({ children }: FFmpegProviderProps) => {
   const notice = useAlert();
   const { current: ffmpeg } = useRef(new FFmpeg());
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [errorData, setErrorData] = useState<Error>();
 
   useEffect(() => {
     const logListener: LogEventCallback = e => {
@@ -51,25 +55,35 @@ export const FFmpegProvider = ({ children }: FFmpegProviderProps) => {
             javascript,
           ),
         });
-        setLoading(false);
       } catch (err) {
         if (err instanceof Error) {
           console.error(err);
           notice.error(err.message);
+          setErrorData(err);
         }
+
+        setError(true);
+      } finally {
+        setLoading(false);
       }
     })();
 
     return () => {
       ffmpeg.off("log", logListener);
+      setLoading(true);
+      setError(false);
+      setErrorData(undefined);
     };
   }, []);
 
   return (
     <FFmpegContext.Provider
+      // @ts-ignore
       value={{
         ffmpeg,
         loading,
+        error,
+        errorData,
       }}
     >
       {children}

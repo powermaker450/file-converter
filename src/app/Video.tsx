@@ -1,5 +1,5 @@
 import MainView from "../components/MainView";
-import { Button, Grid } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import {
   AutoAwesomeMotion,
   CloudUpload,
@@ -46,6 +46,7 @@ const Video = () => {
         crf.toString(),
         "-b:a",
         `${audioQuality}k`,
+        "-vf",
         `fps=${fps}`,
         "output.mp4",
       ]);
@@ -123,9 +124,13 @@ const Video = () => {
           <Button variant="contained" onClick={execute}>
             Execute
           </Button>
-
-          {downloadUrl && <video controls src={downloadUrl} />}
         </Grid>
+
+        <Box sx={{ width: "50%", alignSelf: "center" }}>
+          {downloadUrl && (
+            <video style={{ width: "100%" }} controls src={downloadUrl} />
+          )}
+        </Box>
       </Grid>
     );
   }

@@ -26,19 +26,17 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <CssBaseline>
-          <TopBarProvider>
-            <AlertProvider>
-              <FFmpegProvider>
-                <Routes>
-                  <Route element={<RootLayout />}>
-                    <Route path="/" element={<App />} />
-                    <Route path="/video" element={<Video />} />
-                    <Route path="/audio" element={<Audio />} />
-                  </Route>
-                </Routes>
-              </FFmpegProvider>
-            </AlertProvider>
-          </TopBarProvider>
+          <AlertProvider>
+            <FFmpegProvider>
+              <Routes>
+                <Route element={<RootLayout />}>
+                  <Route path="/" element={<App />} />
+                  <Route path="/video" element={<Video />} />
+                  <Route path="/audio" element={<Audio />} />
+                </Route>
+              </Routes>
+            </FFmpegProvider>
+          </AlertProvider>
         </CssBaseline>
       </ThemeProvider>
     </BrowserRouter>
