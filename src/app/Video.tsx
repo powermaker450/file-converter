@@ -1,6 +1,11 @@
 import MainView from "../components/MainView";
 import { Button, Grid } from "@mui/material";
-import { CloudUpload, Hd, Speaker } from "@mui/icons-material";
+import {
+  AutoAwesomeMotion,
+  CloudUpload,
+  Hd,
+  Speaker,
+} from "@mui/icons-material";
 import { useFilePicker } from "use-file-picker";
 import { useCallback, useEffect, useState, type JSX } from "react";
 import { useAlert } from "../contexts/AlertProvider";
@@ -15,6 +20,8 @@ const Video = () => {
 
   const [crf, setCrf] = useState(32);
   const [audioQuality, setAudioQuality] = useState(128);
+  const [fps, setFps] = useState(30);
+
   const [downloadUrl, setDownloadUrl] = useState<string>();
 
   const picker = useFilePicker({
@@ -39,6 +46,7 @@ const Video = () => {
         crf.toString(),
         "-b:a",
         `${audioQuality}k`,
+        `fps=${fps}`,
         "output.mp4",
       ]);
       const file = await ffmpeg.readFile("output.mp4");
@@ -49,7 +57,7 @@ const Video = () => {
         notice.error(err.message);
       }
     }
-  }, [video, crf, audioQuality, notice, setDownloadUrl]);
+  }, [video, crf, fps, audioQuality, notice, setDownloadUrl]);
 
   useEffect(() => {
     async function set() {
@@ -100,6 +108,16 @@ const Video = () => {
             setValue={setAudioQuality}
             min={1}
             max={320}
+          />
+
+          <ValueSlider
+            title="FPS"
+            icon={<AutoAwesomeMotion />}
+            value={fps}
+            setValue={setFps}
+            min={5}
+            max={60}
+            step={5}
           />
 
           <Button variant="contained" onClick={execute}>

@@ -6,6 +6,7 @@ interface ValueSliderProps {
   icon: JSX.Element;
   min?: number;
   max?: number;
+  step?: number;
   value: number;
   setValue: (newValue: number) => void;
 }
@@ -15,6 +16,7 @@ export default function ValueSlider({
   icon,
   min,
   max,
+  step,
   value,
   setValue,
 }: ValueSliderProps) {
@@ -34,6 +36,7 @@ export default function ValueSlider({
           onChange={handleChange}
           min={min}
           max={max}
+          step={step}
           valueLabelDisplay="auto"
         />
       </Stack>
