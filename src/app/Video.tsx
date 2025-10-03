@@ -150,7 +150,7 @@ const Video = () => {
           remove={picker.clear}
         />
 
-        <Grid container direction="column" justifyContent="space-between">
+        <Grid container direction="column" justifyContent="space-evenly">
           <ValueSlider
             title="CRF"
             icon={<Hd />}
