@@ -85,7 +85,7 @@ const Video = () => {
           disabled={picker.loading}
           onClick={picker.openFilePicker}
         >
-          Upload video
+          Select video
         </Button>
       </MainView>
     );
