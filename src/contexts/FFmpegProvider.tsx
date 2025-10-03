@@ -78,7 +78,6 @@ export const FFmpegProvider = ({ children }: FFmpegProviderProps) => {
 
   return (
     <FFmpegContext.Provider
-      // @ts-ignore
       value={{
         ffmpeg,
         loading,
