@@ -7,6 +7,7 @@ interface ValueSliderProps {
   min?: number;
   max?: number;
   step?: number;
+  disabled?: boolean;
   value: number;
   setValue: (newValue: number) => void;
 }
@@ -17,6 +18,7 @@ export default function ValueSlider({
   min,
   max,
   step,
+  disabled,
   value,
   setValue,
 }: ValueSliderProps) {
@@ -37,6 +39,7 @@ export default function ValueSlider({
           min={min}
           max={max}
           step={step}
+          disabled={disabled}
           valueLabelDisplay="auto"
         />
       </Stack>

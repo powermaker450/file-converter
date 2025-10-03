@@ -20,6 +20,8 @@ import { useFFmpeg } from "../contexts/FFmpegProvider";
 import { fetchFile } from "@ffmpeg/util";
 import FilePreview from "../components/FilePreview";
 import ValueSlider from "../components/ValueSlider";
+import type { ProgressEventCallback } from "@ffmpeg/ffmpeg";
+import ProgressBar from "../components/ProgressBar";
 
 interface VideoStyleSheet {
   filePreview: ComponentProps<typeof FilePreview>["sx"];
@@ -33,6 +35,8 @@ const Video = () => {
   const [crf, setCrf] = useState(32);
   const [audioQuality, setAudioQuality] = useState(128);
   const [fps, setFps] = useState(30);
+  const [progress, setProgress] = useState(0);
+  const [converting, setConverting] = useState(false);
 
   const [downloadUrl, setDownloadUrl] = useState<string>();
 
@@ -50,6 +54,9 @@ const Video = () => {
     }
 
     try {
+      setConverting(true);
+      downloadUrl && setDownloadUrl(undefined);
+
       await ffmpeg.exec([
         "-i",
         video.name,
@@ -68,8 +75,33 @@ const Video = () => {
         console.error(err);
         notice.error(err.message);
       }
+    } finally {
+      setConverting(false);
+      setProgress(0);
     }
-  }, [video, crf, fps, audioQuality, notice, setDownloadUrl]);
+  }, [
+    video,
+    crf,
+    fps,
+    audioQuality,
+    notice,
+    downloadUrl,
+    setDownloadUrl,
+    setConverting,
+    setProgress,
+  ]);
+
+  useEffect(() => {
+    const progressListener: ProgressEventCallback = e => {
+      console.warn("[FFMPEG Progress]", e.progress);
+      setProgress(e.progress * 100);
+    };
+    ffmpeg.on("progress", progressListener);
+
+    return () => {
+      ffmpeg.off("progress", progressListener);
+    };
+  }, []);
 
   useEffect(() => {
     async function set() {
@@ -114,6 +146,7 @@ const Video = () => {
         <FilePreview
           sx={styles.filePreview}
           file={video}
+          disableRemove={converting}
           remove={picker.clear}
         />
 
@@ -125,6 +158,7 @@ const Video = () => {
             setValue={setCrf}
             min={4}
             max={63}
+            disabled={converting}
           />
 
           <ValueSlider
@@ -134,6 +168,7 @@ const Video = () => {
             setValue={setAudioQuality}
             min={1}
             max={320}
+            disabled={converting}
           />
 
           <ValueSlider
@@ -144,11 +179,16 @@ const Video = () => {
             min={5}
             max={60}
             step={5}
+            disabled={converting}
           />
 
-          <Button variant="contained" onClick={execute}>
-            Execute
-          </Button>
+          {converting ? (
+            <ProgressBar sx={{ alignSelf: "center" }} value={progress} />
+          ) : (
+            <Button variant="contained" onClick={execute}>
+              Execute
+            </Button>
+          )}
         </Grid>
 
         <Box sx={styles.videoBox}>

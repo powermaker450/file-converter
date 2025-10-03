@@ -10,10 +10,11 @@ import type { ComponentProps } from "react";
 interface FilePreviewProps {
   file: File | undefined;
   sx?: ComponentProps<typeof Card>["sx"];
+  disableRemove?: boolean;
   remove: () => void;
 }
 
-const FilePreview = ({ file, sx, remove }: FilePreviewProps) => {
+const FilePreview = ({ file, sx, disableRemove, remove }: FilePreviewProps) => {
   return (
     <Card sx={sx}>
       <CardContent>
@@ -24,7 +25,7 @@ const FilePreview = ({ file, sx, remove }: FilePreviewProps) => {
       </CardContent>
 
       <CardActions>
-        <Button onClick={remove} color="error">
+        <Button onClick={remove} disabled={disableRemove} color="error">
           Remove
         </Button>
       </CardActions>
