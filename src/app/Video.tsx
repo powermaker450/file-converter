@@ -7,7 +7,7 @@ import {
   Speaker,
 } from "@mui/icons-material";
 import { useFilePicker } from "use-file-picker";
-import { useCallback, useEffect, useState, type JSX } from "react";
+import { useCallback, useEffect, useMemo, useState, type JSX } from "react";
 import { useAlert } from "../contexts/AlertProvider";
 import { useFFmpeg } from "../contexts/FFmpegProvider";
 import { fetchFile } from "@ffmpeg/util";
@@ -29,8 +29,7 @@ const Video = () => {
     accept: "video/*",
   });
 
-  const video = picker.plainFiles.at(0);
-  const videoUrl = video && URL.createObjectURL(video);
+  const video = useMemo(() => picker.plainFiles.at(0), [picker.plainFiles]);
 
   const execute = useCallback(async () => {
     if (!video) {
@@ -62,15 +61,18 @@ const Video = () => {
 
   useEffect(() => {
     async function set() {
-      if (!videoUrl) {
+      if (!video) {
         return;
       }
 
-      await ffmpeg.writeFile(video.name, await fetchFile(videoUrl));
+      await ffmpeg.writeFile(
+        video.name,
+        await fetchFile(URL.createObjectURL(video)),
+      );
     }
 
     set();
-  }, [videoUrl]);
+  }, [video]);
 
   let content: JSX.Element;
 
