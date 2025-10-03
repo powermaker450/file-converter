@@ -22,6 +22,8 @@ import FilePreview from "../components/FilePreview";
 import ValueSlider from "../components/ValueSlider";
 import type { ProgressEventCallback } from "@ffmpeg/ffmpeg";
 import ProgressBar from "../components/ProgressBar";
+import { VideoExtension } from "../util/VideoTypes";
+import EnumSelector from "../components/EnumSelector";
 
 interface VideoStyleSheet {
   filePreview: ComponentProps<typeof FilePreview>["sx"];
@@ -37,6 +39,7 @@ const Video = () => {
   const [fps, setFps] = useState(30);
   const [progress, setProgress] = useState(0);
   const [converting, setConverting] = useState(false);
+  const [videoExtension, setVideoExtension] = useState<VideoExtension>();
 
   const [downloadUrl, setDownloadUrl] = useState<string>();
 
@@ -66,7 +69,7 @@ const Video = () => {
         `${audioQuality}k`,
         "-vf",
         `fps=${fps}`,
-        "output.mp4",
+        videoExtension ? video.name + videoExtension : video.name,
       ]);
       const file = await ffmpeg.readFile("output.mp4");
       setDownloadUrl(URL.createObjectURL(new Blob([file])));
@@ -89,6 +92,7 @@ const Video = () => {
     setDownloadUrl,
     setConverting,
     setProgress,
+    videoExtension,
   ]);
 
   useEffect(() => {
