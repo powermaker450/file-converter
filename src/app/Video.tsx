@@ -7,12 +7,24 @@ import {
   Speaker,
 } from "@mui/icons-material";
 import { useFilePicker } from "use-file-picker";
-import { useCallback, useEffect, useMemo, useState, type JSX } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ComponentProps,
+  type JSX,
+} from "react";
 import { useAlert } from "../contexts/AlertProvider";
 import { useFFmpeg } from "../contexts/FFmpegProvider";
 import { fetchFile } from "@ffmpeg/util";
 import FilePreview from "../components/FilePreview";
 import ValueSlider from "../components/ValueSlider";
+
+interface VideoStyleSheet {
+  filePreview: ComponentProps<typeof FilePreview>["sx"];
+  videoBox: ComponentProps<typeof Box>["sx"];
+}
 
 const Video = () => {
   const notice = useAlert();
@@ -74,6 +86,13 @@ const Video = () => {
     set();
   }, [video]);
 
+  const styles: VideoStyleSheet = {
+    filePreview: {
+      alignSelf: "center",
+    },
+    videoBox: { width: "50%", alignSelf: "center" },
+  };
+
   let content: JSX.Element;
 
   if (!picker.filesContent.length) {
@@ -92,7 +111,11 @@ const Video = () => {
   } else {
     content = (
       <Grid container spacing={5}>
-        <FilePreview file={video} remove={picker.clear} />
+        <FilePreview
+          sx={styles.filePreview}
+          file={video}
+          remove={picker.clear}
+        />
 
         <Grid container direction="column" justifyContent="space-between">
           <ValueSlider
@@ -128,7 +151,7 @@ const Video = () => {
           </Button>
         </Grid>
 
-        <Box sx={{ width: "50%", alignSelf: "center" }}>
+        <Box sx={styles.videoBox}>
           {downloadUrl && (
             <video style={{ width: "100%" }} controls src={downloadUrl} />
           )}
