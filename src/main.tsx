@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import App from "./app/App";
 import Audio from "./app/Audio";
 import Video from "./app/Video";
-import { TopBarProvider } from "./contexts/TopBarProvider";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
