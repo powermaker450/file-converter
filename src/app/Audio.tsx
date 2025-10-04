@@ -1,6 +1,6 @@
 import { useFilePicker } from "use-file-picker";
 import { useCallback, useEffect, useMemo, useState, type JSX } from "react";
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { CloudUpload, Speaker } from "@mui/icons-material";
 import { useAlert } from "../contexts/AlertProvider";
 import { useFFmpeg } from "../contexts/FFmpegProvider";
@@ -102,6 +102,12 @@ const Audio = () => {
 
     set();
   }, [audio]);
+
+  return (
+    <MainView>
+      <Typography variant="h2">Under Construction!</Typography>
+    </MainView>
+  );
 
   let content: JSX.Element;
 
