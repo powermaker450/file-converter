@@ -155,7 +155,7 @@ const Video = () => {
     );
   } else {
     content = (
-      <Grid container spacing={5}>
+      <Grid container spacing={5} justifyContent="space-evenly">
         <FilePreview
           sx={styles.filePreview}
           file={video}
@@ -212,7 +212,12 @@ const Video = () => {
 
         <Box sx={styles.videoBox}>
           {downloadUrl && (
-            <video style={{ width: "100%" }} controls src={downloadUrl} />
+            <video
+              style={{ width: "100%" }}
+              controls
+              autoPlay
+              src={downloadUrl}
+            />
           )}
         </Box>
       </Grid>

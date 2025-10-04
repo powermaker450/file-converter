@@ -1,29 +1,30 @@
-import { Box, LinearProgress } from "@mui/material";
+import { LinearProgress, Stack, Typography } from "@mui/material";
 import type { ComponentProps } from "react";
 
-type BoxProps = ComponentProps<typeof Box>;
+type StackProps = ComponentProps<typeof Stack>;
 
 interface ProgressBarProps {
   value: number;
-  sx?: BoxProps["sx"];
+  sx?: StackProps["sx"];
 }
 
 interface ProgressBarStyleSheet {
-  box: BoxProps["sx"];
+  stack: StackProps["sx"];
 }
 
 const ProgressBar = ({ value, sx }: ProgressBarProps) => {
   const styles: ProgressBarStyleSheet = {
-    box: {
-      width: 100,
+    stack: {
+      width: 150,
       ...sx,
     },
   };
 
   return (
-    <Box sx={styles.box}>
+    <Stack spacing={1} sx={styles.stack}>
       <LinearProgress variant="determinate" value={value} />
-    </Box>
+      <Typography variant="body1">{value.toFixed(0)}%</Typography>
+    </Stack>
   );
 };
 
