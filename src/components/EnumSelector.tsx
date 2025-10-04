@@ -6,12 +6,16 @@ import {
   Select,
   type SelectChangeEvent,
 } from "@mui/material";
-import { useState, type ComponentProps } from "react";
+import { type ComponentProps } from "react";
 
 type BoxProps = ComponentProps<typeof Box>;
+type ObjectWithStrings = Record<string, string>;
 
-interface EnumSelectorProps<T extends object> {
+interface EnumSelectorProps<T extends ObjectWithStrings> {
+  value: T[keyof T] | null;
+  setValue: (value: T[keyof T]) => void;
   enumerable: T;
+  disabled?: boolean;
   sx?: BoxProps["sx"];
 }
 
@@ -19,14 +23,17 @@ interface EnumSelectorStyleSheet {
   box: BoxProps["sx"];
 }
 
-export default function EnumSelector<T extends object>({
+export default function EnumSelector<T extends ObjectWithStrings>({
+  value,
+  setValue,
   enumerable,
+  disabled,
   sx,
 }: EnumSelectorProps<T>) {
-  const [selectedValue, setSelectedValue] = useState("");
+  type ValueOfT = T[keyof T];
 
-  const handleChange = (e: SelectChangeEvent) => {
-    setSelectedValue(e.target.value);
+  const handleChange = (e: SelectChangeEvent<ValueOfT>) => {
+    setValue(e.target.value as ValueOfT);
   };
 
   const styles: EnumSelectorStyleSheet = {
@@ -41,9 +48,10 @@ export default function EnumSelector<T extends object>({
       <FormControl fullWidth>
         <InputLabel>Video Type</InputLabel>
         <Select
-          value={selectedValue}
+          value={value ?? ""}
           label="Video Type"
           onChange={handleChange}
+          disabled={disabled}
         >
           {Object.entries(enumerable).map(([key, value]) => (
             <MenuItem value={value}>{key}</MenuItem>

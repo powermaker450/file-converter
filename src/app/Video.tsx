@@ -22,7 +22,7 @@ import FilePreview from "../components/FilePreview";
 import ValueSlider from "../components/ValueSlider";
 import type { ProgressEventCallback } from "@ffmpeg/ffmpeg";
 import ProgressBar from "../components/ProgressBar";
-import { VideoExtension } from "../util/VideoTypes";
+import { VideoExtension } from "../util/VideoExtension";
 import EnumSelector from "../components/EnumSelector";
 
 interface VideoStyleSheet {
@@ -39,7 +39,9 @@ const Video = () => {
   const [fps, setFps] = useState(30);
   const [progress, setProgress] = useState(0);
   const [converting, setConverting] = useState(false);
-  const [videoExtension, setVideoExtension] = useState<VideoExtension>();
+  const [videoExtension, setVideoExtension] = useState<VideoExtension | null>(
+    null,
+  );
 
   const [downloadUrl, setDownloadUrl] = useState<string>();
 
@@ -60,6 +62,13 @@ const Video = () => {
       setConverting(true);
       downloadUrl && setDownloadUrl(undefined);
 
+      const lastIndexOfDot = video.name.lastIndexOf(".");
+      const nameWithoutExtension = video.name.slice(0, lastIndexOfDot);
+      const extension = video.name.slice(lastIndexOfDot);
+      const newFileName = videoExtension
+        ? nameWithoutExtension + videoExtension
+        : `${nameWithoutExtension}-modified${extension}`;
+
       await ffmpeg.exec([
         "-i",
         video.name,
@@ -69,9 +78,9 @@ const Video = () => {
         `${audioQuality}k`,
         "-vf",
         `fps=${fps}`,
-        videoExtension ? video.name + videoExtension : video.name,
+        newFileName,
       ]);
-      const file = await ffmpeg.readFile("output.mp4");
+      const file = await ffmpeg.readFile(newFileName);
       setDownloadUrl(URL.createObjectURL(new Blob([file])));
     } catch (err) {
       if (err instanceof Error) {
@@ -184,6 +193,12 @@ const Video = () => {
             max={60}
             step={5}
             disabled={converting}
+          />
+
+          <EnumSelector
+            value={videoExtension}
+            setValue={setVideoExtension}
+            enumerable={VideoExtension}
           />
 
           {converting ? (
