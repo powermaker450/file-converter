@@ -81,7 +81,7 @@ const Video = () => {
         newFileName,
       ]);
       const file = await ffmpeg.readFile(newFileName);
-      setDownloadUrl(URL.createObjectURL(new Blob([file])));
+      setDownloadUrl(URL.createObjectURL(new Blob([file], { type: `video/${newFileName.slice(newFileName.lastIndexOf(".") + 1)}` })));
     } catch (err) {
       if (err instanceof Error) {
         console.error(err);
