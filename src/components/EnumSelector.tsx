@@ -12,6 +12,7 @@ type BoxProps = ComponentProps<typeof Box>;
 type ObjectWithStrings = Record<string, string>;
 
 interface EnumSelectorProps<T extends ObjectWithStrings> {
+  label: string;
   value: T[keyof T] | null;
   setValue: (value: T[keyof T]) => void;
   enumerable: T;
@@ -24,6 +25,7 @@ interface EnumSelectorStyleSheet {
 }
 
 export default function EnumSelector<T extends ObjectWithStrings>({
+  label,
   value,
   setValue,
   enumerable,
@@ -46,10 +48,10 @@ export default function EnumSelector<T extends ObjectWithStrings>({
   return (
     <Box sx={styles.box}>
       <FormControl fullWidth>
-        <InputLabel>Video Type</InputLabel>
+        <InputLabel>{label}</InputLabel>
         <Select
           value={value ?? ""}
-          label="Video Type"
+          label={label}
           onChange={handleChange}
           disabled={disabled}
         >

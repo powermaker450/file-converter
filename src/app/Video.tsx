@@ -81,7 +81,13 @@ const Video = () => {
         newFileName,
       ]);
       const file = await ffmpeg.readFile(newFileName);
-      setDownloadUrl(URL.createObjectURL(new Blob([file], { type: `video/${newFileName.slice(newFileName.lastIndexOf(".") + 1)}` })));
+      setDownloadUrl(
+        URL.createObjectURL(
+          new Blob([file], {
+            type: `video/${newFileName.slice(newFileName.lastIndexOf(".") + 1)}`,
+          }),
+        ),
+      );
     } catch (err) {
       if (err instanceof Error) {
         console.error(err);
@@ -196,6 +202,7 @@ const Video = () => {
           />
 
           <EnumSelector
+            label="Video Type"
             value={videoExtension}
             setValue={setVideoExtension}
             enumerable={VideoExtension}
