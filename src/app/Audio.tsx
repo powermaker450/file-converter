@@ -1,6 +1,6 @@
 import { useFilePicker } from "use-file-picker";
-import { useCallback, useEffect, useMemo, useState, type JSX } from "react";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { useEffect, useMemo, useState, type JSX } from "react";
+import { Box, Button, Grid } from "@mui/material";
 import { CloudUpload, Speaker } from "@mui/icons-material";
 import { useAlert } from "../contexts/AlertProvider";
 import { useFFmpeg } from "../contexts/FFmpegProvider";
@@ -16,7 +16,7 @@ const Audio = () => {
   const notice = useAlert();
   const picker = useFilePicker({
     multiple: false,
-    accept: "audio/*",
+    accept: ["opus", "mpeg", "ogg"].map(v => `audio/${v}`),
   });
   const { ffmpeg } = useFFmpeg();
 
@@ -31,7 +31,7 @@ const Audio = () => {
   const audio = useMemo(() => picker.plainFiles.at(0), [picker.plainFiles]);
   const audioIsMp3 = audio ? audio.name.endsWith(".mp3") : false;
 
-  const execute = useCallback(async () => {
+  const execute = async () => {
     if (!audio) {
       notice.error("No audio file selected");
       return;
@@ -68,14 +68,7 @@ const Audio = () => {
     } finally {
       setConverting(false);
     }
-  }, [
-    audio,
-    notice,
-    setConverting,
-    downloadUrl,
-    setDownloadUrl,
-    audioExtension,
-  ]);
+  };
 
   useEffect(() => {
     const progressListener: ProgressEventCallback = e => {
@@ -96,18 +89,13 @@ const Audio = () => {
         return;
       }
       const file = URL.createObjectURL(audio);
+      console.log(file);
 
       await ffmpeg.writeFile(audio.name, file);
     }
 
     set();
   }, [audio]);
-
-  return (
-    <MainView>
-      <Typography variant="h2">Under Construction!</Typography>
-    </MainView>
-  );
 
   let content: JSX.Element;
 
