@@ -1,13 +1,36 @@
-import { AppBar, Button, Toolbar } from "@mui/material";
-import { createContext, type ComponentProps, type ReactNode } from "react";
+import { Settings } from "@mui/icons-material";
+import {
+  AppBar,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  IconButton,
+  Radio,
+  RadioGroup,
+  Stack,
+  Toolbar,
+  useColorScheme,
+  useTheme,
+} from "@mui/material";
+import {
+  createContext,
+  useEffect,
+  useState,
+  type ChangeEvent,
+  type ReactNode,
+} from "react";
 import { Link as RouterLink } from "react-router";
+import localStorageWrapper, {
+  type ThemeValue,
+} from "../util/LocalStorageWrapper";
 
 interface TopBarProviderProps {
   children?: ReactNode;
-}
-
-interface TopBarStyleSheet {
-  toolbar: ComponentProps<typeof Toolbar>["sx"];
 }
 
 interface Route {
@@ -18,10 +41,17 @@ interface Route {
 const TopBarContext = createContext<{} | undefined>(undefined);
 
 export const TopBarProvider = ({ children }: TopBarProviderProps) => {
-  const styles: TopBarStyleSheet = {
-    toolbar: {
-      gap: 5,
-    },
+  const { mode, setMode } = useColorScheme();
+  const theme = useTheme();
+
+  const [settingsMenuShown, setSettingsMenuShown] = useState(false);
+  const showSettingsMenu = () => setSettingsMenuShown(true);
+  const hideSettingsMenu = () => setSettingsMenuShown(false);
+
+  const handleThemeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value as ThemeValue;
+    setMode(e.target.value as ThemeValue);
+    localStorageWrapper.setItem("theme", val);
   };
 
   const routes: Route[] = [
@@ -35,17 +65,77 @@ export const TopBarProvider = ({ children }: TopBarProviderProps) => {
     },
   ];
 
+  useEffect(() => {
+    const localTheme = localStorageWrapper.getItem("theme");
+
+    if (!localTheme) {
+      return;
+    }
+
+    setMode(localTheme);
+  }, []);
+
   return (
     <TopBarContext.Provider value={{}}>
       <AppBar>
-        <Toolbar sx={styles.toolbar}>
-          {routes.map(route => (
-            <Button key={route.text} component={RouterLink} to={route.to}>
-              {route.text}
-            </Button>
-          ))}
+        <Toolbar>
+          <Stack flex={1} direction="row" spacing={2}>
+            {routes.map(route => (
+              // @ts-ignore
+              <Button
+                color={
+                  mode === "light" ? theme.palette.primary.light : undefined
+                }
+                key={route.text}
+                component={RouterLink}
+                to={route.to}
+              >
+                {route.text}
+              </Button>
+            ))}
+          </Stack>
+
+          <Stack flex={1} direction="row" justifyContent="flex-end">
+            <IconButton onClick={showSettingsMenu}>
+              <Settings />
+            </IconButton>
+          </Stack>
         </Toolbar>
       </AppBar>
+
+      <Dialog onClose={hideSettingsMenu} open={settingsMenuShown}>
+        <DialogTitle>Settings</DialogTitle>
+
+        <DialogContent>
+          <FormControl>
+            <FormLabel>Theme</FormLabel>
+
+            <RadioGroup
+              value={mode ?? "system"}
+              onChange={handleThemeChange}
+              sx={{ marginRight: 20 }}
+            >
+              <FormControlLabel
+                value="system"
+                control={<Radio />}
+                label="Auto"
+              />
+              <FormControlLabel
+                value="light"
+                control={<Radio />}
+                label="Light"
+              />
+              <FormControlLabel value="dark" control={<Radio />} label="Dark" />
+            </RadioGroup>
+          </FormControl>
+        </DialogContent>
+
+        <DialogActions>
+          <Button variant="outlined" autoFocus onClick={hideSettingsMenu}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {children}
     </TopBarContext.Provider>
