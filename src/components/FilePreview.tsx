@@ -25,7 +25,12 @@ const FilePreview = ({ file, sx, disableRemove, remove }: FilePreviewProps) => {
       </CardContent>
 
       <CardActions>
-        <Button onClick={remove} disabled={disableRemove} color="error">
+        <Button
+          onClick={remove}
+          disabled={disableRemove}
+          color="error"
+          aria-label={`Remove ${file?.name}`}
+        >
           Remove
         </Button>
       </CardActions>

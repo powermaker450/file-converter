@@ -41,6 +41,7 @@ export default function ValueSlider({
           step={step}
           disabled={disabled}
           valueLabelDisplay="auto"
+          aria-label={`${title} slider`}
         />
       </Stack>
     </Box>

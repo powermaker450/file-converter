@@ -19,15 +19,12 @@ import {
 } from "@mui/material";
 import {
   createContext,
-  useEffect,
   useState,
   type ChangeEvent,
   type ReactNode,
 } from "react";
 import { Link as RouterLink } from "react-router";
-import localStorageWrapper, {
-  type ThemeValue,
-} from "../util/LocalStorageWrapper";
+import { type ThemeValue } from "../util/LocalStorageWrapper";
 
 interface TopBarProviderProps {
   children?: ReactNode;
@@ -77,6 +74,7 @@ export const TopBarProvider = ({ children }: TopBarProviderProps) => {
                 key={route.text}
                 component={RouterLink}
                 to={route.to}
+                aria-label={route.text}
               >
                 {route.text}
               </Button>
@@ -84,7 +82,7 @@ export const TopBarProvider = ({ children }: TopBarProviderProps) => {
           </Stack>
 
           <Stack flex={1} direction="row" justifyContent="flex-end">
-            <IconButton onClick={showSettingsMenu}>
+            <IconButton onClick={showSettingsMenu} aria-label="Settings">
               <Settings />
             </IconButton>
           </Stack>
@@ -107,19 +105,33 @@ export const TopBarProvider = ({ children }: TopBarProviderProps) => {
                 value="system"
                 control={<Radio />}
                 label="Auto"
+                aria-label="Auto"
               />
+
               <FormControlLabel
                 value="light"
                 control={<Radio />}
                 label="Light"
+                aria-label="Light"
               />
-              <FormControlLabel value="dark" control={<Radio />} label="Dark" />
+
+              <FormControlLabel
+                value="dark"
+                control={<Radio />}
+                label="Dark"
+                aria-label="Dark"
+              />
             </RadioGroup>
           </FormControl>
         </DialogContent>
 
         <DialogActions>
-          <Button variant="outlined" autoFocus onClick={hideSettingsMenu}>
+          <Button
+            variant="outlined"
+            autoFocus
+            onClick={hideSettingsMenu}
+            aria-label="Close"
+          >
             Close
           </Button>
         </DialogActions>

@@ -56,7 +56,9 @@ export default function EnumSelector<T extends ObjectWithStrings>({
           disabled={disabled}
         >
           {Object.entries(enumerable).map(([key, value]) => (
-            <MenuItem value={value}>{key}</MenuItem>
+            <MenuItem value={value} aria-label={key}>
+              {key}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>

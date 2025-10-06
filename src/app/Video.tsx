@@ -154,6 +154,7 @@ const Video = () => {
           startIcon={<CloudUpload />}
           disabled={picker.loading}
           onClick={picker.openFilePicker}
+          aria-label="Select video"
         >
           Select video
         </Button>
@@ -211,7 +212,7 @@ const Video = () => {
           {converting ? (
             <ProgressBar sx={{ alignSelf: "center" }} value={progress} />
           ) : (
-            <Button variant="contained" onClick={execute}>
+            <Button variant="contained" onClick={execute} aria-label="Execute">
               Execute
             </Button>
           )}
