@@ -49,9 +49,7 @@ export const TopBarProvider = ({ children }: TopBarProviderProps) => {
   const hideSettingsMenu = () => setSettingsMenuShown(false);
 
   const handleThemeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value as ThemeValue;
     setMode(e.target.value as ThemeValue);
-    localStorageWrapper.setItem("theme", val);
   };
 
   const routes: Route[] = [
@@ -65,24 +63,14 @@ export const TopBarProvider = ({ children }: TopBarProviderProps) => {
     },
   ];
 
-  useEffect(() => {
-    const localTheme = localStorageWrapper.getItem("theme");
-
-    if (!localTheme) {
-      return;
-    }
-
-    setMode(localTheme);
-  }, []);
-
   return (
     <TopBarContext.Provider value={{}}>
       <AppBar>
         <Toolbar>
           <Stack flex={1} direction="row" spacing={2}>
             {routes.map(route => (
-              // @ts-ignore
               <Button
+                // @ts-ignore
                 color={
                   mode === "light" ? theme.palette.primary.light : undefined
                 }
