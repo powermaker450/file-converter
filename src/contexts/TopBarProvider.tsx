@@ -50,10 +50,10 @@ export const TopBarProvider = ({ children }: TopBarProviderProps) => {
   };
 
   const routes: Route[] = [
-    {
-      text: "Audio",
-      to: "/audio",
-    },
+    // {
+    //   text: "Audio",
+    //   to: "/audio",
+    // },
     {
       text: "Video",
       to: "/video",
